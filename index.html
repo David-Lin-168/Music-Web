@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎷好(豪)歌‧動態譜🎷</title>
+    <title>🎷好(豪)歌‧動態譜🎷 | MOBILE-READY</title>
     <style>
         :root {
             --neon-blue: #00f3ff;
@@ -12,18 +12,20 @@
             --bg-dark: #0a0a0b;
         }
 
+        /* 基礎防錯設定 */
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg-dark);
             background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a0b 100%);
             color: var(--neon-blue);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "微軟正黑體", sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
-            padding: 15px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh;
         }
 
         h1 {
@@ -32,68 +34,70 @@
             text-shadow: 0 0 10px var(--neon-blue);
             margin: 20px 0;
             letter-spacing: 2px;
+            border-bottom: 2px solid var(--neon-pink);
+            padding-bottom: 10px;
         }
 
-        /* 歌曲列表容器 */
+        /* 歌曲列表：支援手機滾動 */
         .song-list {
             width: 100%;
             max-width: 800px;
-            max-height: 50vh;
+            max-height: 55vh;
             overflow-y: auto;
-            border: 1px solid var(--neon-blue);
+            border: 1px solid rgba(0, 243, 255, 0.3);
             padding: 5px;
-            background: rgba(0, 0, 0, 0.5);
-            /* 讓捲動更順暢 */
-            -webkit-overflow-scrolling: touch;
+            background: rgba(0, 0, 0, 0.6);
+            -webkit-overflow-scrolling: touch; /* 讓 iOS 滾動更順滑 */
         }
 
-        /* 歌曲卡片設計 (取代原本的 Table) */
+        /* 卡片式排版 */
         .song-card {
             background: rgba(255, 255, 255, 0.05);
-            margin-bottom: 10px;
-            padding: 15px;
+            margin-bottom: 8px;
+            padding: 12px;
             border-left: 4px solid var(--neon-pink);
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .song-info {
             font-size: 1.1rem;
             font-weight: bold;
             color: #fff;
+            text-shadow: 0 0 5px rgba(255,255,255,0.3);
         }
 
-        /* 按鈕群組排版 */
+        /* 按鈕群組：手機兩兩一排 */
         .btn-group {
             display: grid;
-            grid-template-columns: repeat(2, 1fr); /* 手機上兩兩一排 */
+            grid-template-columns: repeat(2, 1fr);
             gap: 8px;
         }
 
-        /* 桌面版改回四個一排 */
+        /* 電腦版自動伸長 */
         @media (min-width: 600px) {
             .song-card { flex-direction: row; align-items: center; justify-content: space-between; }
             .btn-group { grid-template-columns: repeat(4, 1fr); width: auto; }
-            h1 { font-size: 2.2rem; }
+            h1 { font-size: 2rem; }
         }
 
         button {
             background: transparent;
             border: 1px solid var(--neon-blue);
             color: var(--neon-blue);
-            padding: 10px 5px;
+            padding: 12px 5px;
             cursor: pointer;
             font-size: 0.9rem;
             clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
             transition: 0.2s;
         }
 
-        button:active { background: var(--neon-blue); color: #000; }
+        button:active { background: var(--neon-blue); color: #000; opacity: 0.8; }
         .btn-mp3 { border-color: var(--neon-pink); color: var(--neon-pink); }
         .btn-demo { border-color: var(--neon-green); color: var(--neon-green); }
 
-        /* 播放區域 */
+        /* 播放視窗 */
         #media-display {
             display: none;
             width: 100%;
@@ -103,18 +107,19 @@
             background: #000;
             border: 2px solid var(--neon-pink);
             box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+            text-align: center;
         }
 
         #media-content img { width: 100%; height: auto; margin-bottom: 10px; border: 1px solid var(--neon-blue); }
         
-        /* 針對 Safari 修正影片標籤 */
-        video {
+        video, audio {
             width: 100%;
             background: #000;
-            outline: none;
+            border-radius: 4px;
         }
 
         .close-btn { width: 100%; margin-top: 15px; border-color: var(--neon-pink); color: var(--neon-pink); }
+        .status-tag { font-size: 0.7rem; color: var(--neon-pink); margin-top: 10px; opacity: 0.6; }
     </style>
 </head>
 <body>
@@ -122,14 +127,16 @@
     <h1>🎷好(豪)歌‧動態譜🎷</h1>
 
     <div class="song-list" id="song-list">
-        <!-- 歌曲會由 JS 生成 -->
+        <!-- JS 自動生成歌曲卡片 -->
     </div>
 
     <div id="media-display">
-        <div id="media-title" style="color:var(--neon-blue); margin-bottom:10px; font-weight:bold;"></div>
+        <div id="media-title" style="color:var(--neon-blue); margin-bottom:12px; font-weight:bold; font-size: 1.1rem;"></div>
         <div id="media-content"></div>
-        <button class="close-btn" onclick="closePlayer()">關閉視窗</button>
+        <button class="close-btn" onclick="closePlayer()">關閉播放視窗</button>
     </div>
+
+    <div class="status-tag">SYSTEM v2.5 // SAFARI COMPATIBLE ACTIVE</div>
 
     <script>
         const songs = [
@@ -154,17 +161,17 @@
         const mediaContent = document.getElementById('media-content');
         const mediaTitle = document.getElementById('media-title');
 
-        // 生成卡片列表
+        // 生成清單
         songs.forEach((song, index) => {
             const card = document.createElement('div');
             card.className = 'song-card';
             card.innerHTML = `
                 <div class="song-info">${song.name}</div>
                 <div class="btn-group">
-                    <button onclick="openMedia('sheet', ${index}, '${song.name}')">簡譜</button>
-                    <button class="btn-mp3" onclick="openMedia('mp3', '${song.mp3}', '${song.name}')">伴奏</button>
-                    <button class="btn-demo" onclick="openMedia('video', '${song.demo_mp4}', '${song.name}-示範')">示範</button>
-                    <button onclick="openMedia('video', '${song.backing_mp4}', '${song.name}-動態')">動態</button>
+                    <button onclick="openMedia('sheet', ${index}, '${song.name}')">看簡譜</button>
+                    <button class="btn-mp3" onclick="openMedia('mp3', '${song.mp3}', '${song.name}')">聽伴奏</button>
+                    <button class="btn-demo" onclick="openMedia('video', '${song.demo_mp4}', '${song.name}-示範')">看示範</button>
+                    <button onclick="openMedia('video', '${song.backing_mp4}', '${song.name}-動態')">動態譜</button>
                 </div>
             `;
             listContainer.appendChild(card);
@@ -172,7 +179,7 @@
 
         function openMedia(type, urlOrIndex, title) {
             mediaDisplay.style.display = 'block';
-            mediaTitle.innerText = `▶ ${title}`;
+            mediaTitle.innerText = `[ NOW PLAYING ] > ${title}`;
             mediaContent.innerHTML = ''; 
             
             if (type === 'sheet') {
@@ -183,23 +190,38 @@
                 mediaContent.innerHTML = `<audio controls autoplay src="${urlOrIndex}"></audio>`;
             } else if (type === 'video') {
                 /**
-                 * Safari 關鍵修正：
-                 * 1. 使用 playsinline & webkit-playsinline 防止跳出全螢幕
-                 * 2. 加入 preload="metadata" 幫助 Safari 預先獲取影片長度
-                 * 3. 去掉 autoplay，因為 Safari 常攔截非靜音的自動播放
+                 * iPhone Safari 核心修正語法
                  */
                 const videoEl = document.createElement('video');
                 videoEl.controls = true;
-                videoEl.playsInline = true;
-                videoEl.setAttribute('webkit-playsinline', 'true');
-                videoEl.setAttribute('preload', 'metadata');
-                videoEl.src = urlOrIndex;
+                videoEl.playsInline = true; // 必備：防止跳出全螢幕
+                videoEl.setAttribute('webkit-playsinline', 'true'); // 必備：舊版 iOS 相容
+                videoEl.setAttribute('preload', 'auto');
+                videoEl.style.width = '100%';
                 
+                // 使用 Source 標籤能提高 Safari 的識別率
+                const sourceEl = document.createElement('source');
+                sourceEl.src = urlOrIndex;
+                sourceEl.type = 'video/mp4';
+                
+                videoEl.appendChild(sourceEl);
                 mediaContent.appendChild(videoEl);
-                videoEl.play().catch(e => console.log("自動播放被攔截，請手動點擊播放"));
+                
+                // Safari 必須在使用者點擊後觸發 load 與 play
+                videoEl.load();
+                const playPromise = videoEl.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.log("自動播放被攔截，等待使用者點擊播放鈕");
+                    });
+                }
             }
             
-            window.scrollTo({ top: mediaDisplay.offsetTop - 20, behavior: 'smooth' });
+            // 捲動到播放區域
+            setTimeout(() => {
+                mediaDisplay.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }, 100);
         }
 
         function closePlayer() {
