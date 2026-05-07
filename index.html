@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎷好(豪)歌‧動態譜🎷 | CYBER-MUSIC INTERFACE</title>
+    <style>
+        :root {
+            --neon-blue: #00f3ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #39ff14;
+            --bg-dark: #0a0a0b;
+            --panel-bg: rgba(20, 20, 25, 0.9);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
+            color: var(--neon-blue);
+            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+            border-left: 5px solid var(--neon-pink);
+            padding-left: 15px;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+
+         .container {
+            width: 98%;
+            max-width: 1100px;
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            padding: 10px;
+            clip-path: polygon(0 0, 98% 0, 100% 2%, 100% 100%, 2% 100%, 0 98%);
+            
+            /* --- 新增滾動控制 --- */
+            max-height: 370px;       /* 預估 5 首歌曲的高度，可根據實際需求調整數字 */
+            overflow-y: auto;        /* 開啟垂直滾動 */
+            overflow-x: hidden;      /* 隱藏水平滾動 */
+        }
+
+        /* 自定義滾動條樣式 (讓它跟你的霓虹風格一致) */
+        .container::-webkit-scrollbar {
+            width: 6px;
+        }
+        .container::-webkit-scrollbar-track {
+            background: var(--bg-dark);
+        }
+        .container::-webkit-scrollbar-thumb {
+            background: var(--neon-pink);
+            border-radius: 10px;
+            box-shadow: 0 0 10px var(--neon-pink);
+        }
+
+        .song-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .song-item {
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            transition: 0.3s;
+        }
+
+        .song-item:hover {
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        .song-name {
+            padding: 15px;
+            font-size: 1.2em;
+            color: #fff;
+            font-weight: bold;
+            min-width: 180px;
+        }
+
+        /* 按鈕風格設計 */
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding: 10px;
+            justify-content: flex-end;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid var(--neon-blue);
+            color: var(--neon-blue);
+            padding: 8px 14px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-family: inherit;
+            transition: 0.3s;
+            clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
+        }
+
+        button:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        /* 不同的顏色標記 */
+        .btn-mp3 { border-color: var(--neon-pink); color: var(--neon-pink); }
+        .btn-mp3:hover { background: var(--neon-pink); color: #fff; }
+
+        .btn-video-demo { border-color: var(--neon-green); color: var(--neon-green); }
+        .btn-video-demo:hover { background: var(--neon-green); color: #000; }
+
+        /* 媒體播放顯示區 */
+        #media-display {
+            margin-top: 30px;
+            width: 98%;
+            max-width: 1100px;
+            display: none;
+            background: #000;
+            border: 2px solid var(--neon-pink);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.3);
+        }
+
+        iframe { width: 100%; height: 700px; border: none; background: white; }
+        video { width: 100%; max-width: 900px; border: 1px solid var(--neon-blue); }
+        audio { width: 100%; max-width: 500px; margin: 20px 0; }
+
+        .close-btn {
+            margin-top: 20px;
+            padding: 10px 30px;
+            border-color: var(--neon-pink);
+            color: var(--neon-pink);
+        }
+
+        .status-bar {
+            margin-top: 20px;
+            font-size: 0.8em;
+            color: var(--neon-pink);
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>🎷好(豪)歌‧動態譜🎷</h1>
+
+    <div class="container">
+        <table class="song-table">
+            <thead>
+                <tr style="color: var(--neon-pink); text-align: left;">
+                    <th style="padding: 10px;">[ 曲目列表 ]</th>
+                    <th style="padding: 10px; text-align: right;">[ 資源連結 ]</th>
+                </tr>
+            </thead>
+            <tbody id="song-list-body">
+                </tbody>
+        </table>
+    </div>
+
+    <div id="media-display">
+        <h2 id="media-title" style="color: var(--neon-blue);">播放中...</h2>
+        <div id="media-content"></div>
+        <button class="close-btn" onclick="closePlayer()">關閉播放視窗</button>
+    </div>
+
+    <div class="status-bar">SYSTEM STATUS: READY // USER: ADMIN // DATA_LOADED: 100%</div>
+
+    <script>
+        /**
+         * 🎵 歌曲清單配置
+         * 1. sheet: 簡譜路徑
+         * 2. mp3: 伴奏音訊路徑
+         * 3. demo_mp4: 演奏示範影片路徑
+         * 4. backing_mp4: 純伴奏影片路徑
+         */
+         const songs = [
+            {
+                name: "另一種鄉愁",
+                // 這裡改成陣列，放入你的兩張 PNG 檔路徑
+                sheet: ["sheets/另一種鄉愁.png", "sheets/另一種鄉愁1.png"],
+                mp3: "music/另一種鄉愁.mp3",
+                demo_mp4: "video/另一種鄉愁.mp4",
+                backing_mp4: "video/另一種鄉愁1.mp4"
+            },
+           {
+                name: "若是有一天",
+                // 這裡改成陣列，放入你的兩張 PNG 檔路徑
+                sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"],
+                mp3: "music/若是有一天.mp3",
+                demo_mp4: "video/若是有一天.mp4",
+                backing_mp4: "video/若是有一天1.mp4"
+            },  
+{
+                name: "若是有一天",
+                // 這裡改成陣列，放入你的兩張 PNG 檔路徑
+                sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"],
+                mp3: "music/若是有一天.mp3",
+                demo_mp4: "video/若是有一天.mp4",
+                backing_mp4: "video/若是有一天1.mp4"
+            },  
+{
+                name: "若是有一天",
+                // 這裡改成陣列，放入你的兩張 PNG 檔路徑
+                sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"],
+                mp3: "music/若是有一天.mp3",
+                demo_mp4: "video/若是有一天.mp4",
+                backing_mp4: "video/若是有一天1.mp4"
+            },  
+{
+                name: "若是有一天",
+                // 這裡改成陣列，放入你的兩張 PNG 檔路徑
+                sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"],
+                mp3: "music/若是有一天.mp3",
+                demo_mp4: "video/若是有一天.mp4",
+                backing_mp4: "video/若是有一天1.mp4"
+            },  
+{
+                name: "若是有一天",
+                // 這裡改成陣列，放入你的兩張 PNG 檔路徑
+                sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"],
+                mp3: "music/若是有一天.mp3",
+                demo_mp4: "video/若是有一天.mp4",
+                backing_mp4: "video/若是有一天1.mp4"
+            },  
+{
+                name: "若是有一天",
+                // 這裡改成陣列，放入你的兩張 PNG 檔路徑
+                sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"],
+                mp3: "music/若是有一天.mp3",
+                demo_mp4: "video/若是有一天.mp4",
+                backing_mp4: "video/若是有一天1.mp4"
+            },  
+{
+                name: "若是有一天",
+                // 這裡改成陣列，放入你的兩張 PNG 檔路徑
+                sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"],
+                mp3: "music/若是有一天.mp3",
+                demo_mp4: "video/若是有一天.mp4",
+                backing_mp4: "video/若是有一天1.mp4"
+            },  
+{
+                name: "若是有一天",
+                // 這裡改成陣列，放入你的兩張 PNG 檔路徑
+                sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"],
+                mp3: "music/若是有一天.mp3",
+                demo_mp4: "video/若是有一天.mp4",
+                backing_mp4: "video/若是有一天1.mp4"
+            },  
+        ];
+
+        const listBody = document.getElementById('song-list-body');
+        const mediaDisplay = document.getElementById('media-display');
+        const mediaContent = document.getElementById('media-content');
+        const mediaTitle = document.getElementById('media-title');
+
+// 生成清單
+        songs.forEach((song, index) => {
+            const tr = document.createElement('tr');
+            tr.className = 'song-item';
+            // 注意這裡：改用 index 來傳遞，這樣就能精準抓到陣列
+            tr.innerHTML = `
+                <td class="song-name">${song.name}</td>
+                <td class="btn-group">
+                    <button onclick="openMedia('sheet', ${index}, '${song.name}')">1.簡譜</button>
+                    <button class="btn-mp3" onclick="openMedia('mp3', '${song.mp3}', '${song.name}')">2.伴奏.mp3</button>
+                    <button class="btn-video-demo" onclick="openMedia('video', '${song.demo_mp4}', '${song.name} - 演奏示範')">3.演奏示範(動態譜)</button>
+                    <button onclick="openMedia('video', '${song.backing_mp4}', '${song.name} - 純伴奏')">4.純伴奏(動態譜)</button>
+                </td>
+            `;
+            listBody.appendChild(tr);
+        });
+
+        // 統一播放控制 (修改此處)
+        function openMedia(type, urlOrIndex, title) {
+            mediaDisplay.style.display = 'block';
+            mediaTitle.innerText = `> 正在讀取: ${title}`;
+            mediaContent.innerHTML = ''; 
+            
+            if (type === 'sheet') {
+                // 從 songs 陣列中根據 index 抓取正確的 sheet 資料
+                const sheetData = songs[urlOrIndex].sheet;
+                let imgs = Array.isArray(sheetData) ? sheetData : [sheetData];
+                mediaContent.innerHTML = imgs.map(imgUrl => `<img src="${imgUrl}" style="width:100%; margin-bottom:10px; border:1px solid #00f3ff;">`).join('');
+            } else if (type === 'mp3') {
+                mediaContent.innerHTML = `<p style="color:#fff">音訊軌道載入中...</p><audio controls autoplay src="${urlOrIndex}"></audio>`;
+            } else if (type === 'video') {
+                mediaContent.innerHTML = `<video controls autoplay src="${urlOrIndex}"></video>`;
+            }
+            
+            window.scrollTo({ top: mediaDisplay.offsetTop - 20, behavior: 'smooth' });
+        }
+        function closePlayer() {
+            mediaDisplay.style.display = 'none';
+            mediaContent.innerHTML = '';
+        }
+    </script>
+</body>
+</html>
