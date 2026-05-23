@@ -2,185 +2,403 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>🎷好(豪)歌‧動態譜🎷</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> 🎷好(豪)歌‧動態譜🎷  CYBER-MUSIC INTERFACE </title>
     <style>
         :root {
             --neon-blue: #00f3ff;
             --neon-pink: #ff00ff;
             --neon-green: #39ff14;
             --bg-dark: #0a0a0b;
+            --panel-bg: rgba(20, 20, 25, 0.9);
         }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         body {
             background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #0a0a0b 100%);
+            background-image: 
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 2px, 3px 100%;
             color: var(--neon-blue);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: 10px;
+            font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            margin: 0;
+            padding: 20px;
         }
 
         h1 {
-            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--neon-blue), 0 0 20px var(--neon-blue);
+            padding-left: 15px;
+            margin-bottom: 30px;
+            font-size: 2.2em;
             text-align: center;
-            text-shadow: 0 0 10px var(--neon-blue);
-            margin: 20px 0;
-            letter-spacing: 2px;
-            border-bottom: 2px solid var(--neon-pink);
-            padding-bottom: 10px;
         }
 
-        .song-list {
-            width: 100%;
-            max-width: 800px;
-            max-height: 50vh;
+        .container {
+            width: 98%;
+            max-width: 1100px;
+            background: var(--panel-bg);
+            border: 1px solid var(--neon-blue);
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+            padding: 10px;
+            clip-path: polygon(0 0, 98% 0, 100% 2%, 100% 100%, 2% 100%, 0 98%);
+        }
+
+        .table-scroll-container {
+            max-height: 600px;
             overflow-y: auto;
-            border: 1px solid rgba(0, 243, 255, 0.3);
-            background: rgba(0, 0, 0, 0.6);
-            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--neon-blue) var(--bg-dark);
         }
 
-        .song-card {
-            background: rgba(255, 255, 255, 0.05);
-            margin-bottom: 8px;
-            padding: 12px;
+        .song-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .song-item {
+            border-bottom: 1px solid rgba(0, 243, 255, 0.2);
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent; /* 為高亮光條預留空間 */
+        }
+
+        .song-item:hover {
+            background: rgba(0, 243, 255, 0.05);
+        }
+
+        /* 💡 新增：當前播放曲目高亮顯示效果 */
+        .song-item.active-song {
+            background: rgba(0, 243, 255, 0.15) !important;
             border-left: 4px solid var(--neon-pink);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            box-shadow: inset 50px 0 50px -50px var(--neon-pink);
+        }
+        .song-item.active-song .song-name {
+            color: var(--neon-pink);
+            text-shadow: 0 0 5px var(--neon-pink);
         }
 
-        .song-info { font-size: 1.1rem; font-weight: bold; color: #fff; }
+        .song-name {
+            padding: 15px;
+            font-size: 1.2em;
+            color: #fff;
+            font-weight: bold;
+            min-width: 180px;
+            transition: 0.3s;
+        }
 
-        .btn-group { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
-
-        @media (min-width: 600px) {
-            .song-card { flex-direction: row; align-items: center; justify-content: space-between; }
-            .btn-group { grid-template-columns: repeat(4, 1fr); width: auto; }
+        .btn-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            max-width: 380px;
+            margin-left: auto;
+            padding: 10px 0;
         }
 
         button {
             background: transparent;
             border: 1px solid var(--neon-blue);
             color: var(--neon-blue);
-            padding: 12px 5px;
+            padding: 8px 14px;
             cursor: pointer;
-            font-size: 0.9rem;
+            font-size: 0.9em;
+            font-family: inherit;
+            transition: 0.3s;
             clip-path: polygon(10% 0, 100% 0, 100% 70%, 90% 100%, 0 100%, 0 30%);
-        }
-
-        button:active { background: var(--neon-blue); color: #000; }
-        .btn-mp3 { border-color: var(--neon-pink); color: var(--neon-pink); }
-        .btn-demo { border-color: var(--neon-green); color: var(--neon-green); }
-
-        #media-display {
-            display: none;
-            width: 100%;
-            max-width: 800px;
-            margin-top: 20px;
-            padding: 15px;
-            background: #000;
-            border: 2px solid var(--neon-pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             text-align: center;
         }
 
-        video, audio { width: 100%; background: #000; }
-        #media-content img { width: 100%; height: auto; border: 1px solid var(--neon-blue); }
-        .close-btn { width: 100%; margin-top: 15px; border-color: var(--neon-pink); color: var(--neon-pink); }
+        .btn-group button {
+            width: 100%;
+            box-sizing: border-box;
+            min-height: 40px;
+        }
+
+        button:hover {
+            background: var(--neon-blue);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-blue);
+        }
+
+        .btn-mp3 { border-color: var(--neon-pink); color: var(--neon-pink); }
+        .btn-mp3:hover { background: var(--neon-pink); color: #fff; }
+
+        .btn-video-demo { border-color: var(--neon-green); color: var(--neon-green); }
+        .btn-video-demo:hover { background: var(--neon-green); color: #000; }
+
+        #media-display {
+            margin-top: 30px;
+            width: 98%;
+            max-width: 1100px;
+            display: none;
+            background: #000;
+            border: 2px solid var(--neon-pink);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.3);
+            box-sizing: border-box;
+        }
+
+        .media-header-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .media-action-btn {
+            font-size: 0.85em;
+            padding: 6px 12px;
+        }
+
+        video { width: 100%; max-width: 900px; border: 1px solid var(--neon-blue); }
+        .close-btn { margin-top: 20px; padding: 10px 30px; border-color: var(--neon-pink); color: var(--neon-pink); }
+        .status-bar { margin-top: 20px; font-size: 0.8em; color: var(--neon-pink); text-transform: uppercase; text-align: center; }
+
+        /* 💡 新增：手機版響應式卡片排版 (最佳化 UX) */
+        @media (max-width: 768px) {
+            h1 { font-size: 1.6em; margin-bottom: 20px; }
+            .container { clip-path: none; border-radius: 8px; padding: 5px; } /* 手機版取消斜角，避免吃掉畫面邊緣空間 */
+            
+            .song-table thead {
+                display: none; /* 手機端隱藏表頭，畫面更直覺乾淨 */
+            }
+            .song-table tr {
+                display: block; /* 將列轉為區塊 */
+                margin-bottom: 10px;
+                border: 1px solid rgba(0, 243, 255, 0.2);
+                border-radius: 8px;
+                background: rgba(10, 10, 15, 0.5);
+                border-left: 4px solid transparent;
+            }
+            .song-table td {
+                display: block; /* 將儲存格轉為區塊，上下排列 */
+                width: 100%;
+                text-align: center; /* 手機版全置中 */
+                box-sizing: border-box;
+            }
+            .song-name {
+                padding: 15px 10px 5px 10px;
+                font-size: 1.1em;
+            }
+            .btn-group {
+                grid-template-columns: repeat(2, 1fr); /* 保持 2x2，但寬度撐滿 */
+                max-width: 100%;
+                margin: 0 auto;
+                padding: 10px 15px 15px 15px;
+                gap: 10px;
+            }
+            .btn-group button {
+                padding: 12px 5px; /* 增加上下 Padding，讓手指更好點擊 */
+                font-size: 0.85em;
+                line-height: 1.2;
+                clip-path: none; /* 手機版按鈕取消切角，確保點擊範圍最大化 */
+                border-radius: 4px;
+            }
+            .media-header-container {
+                flex-direction: column; /* 播放器標題與按鈕在手機上改為上下排 */
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <h1>🎷好(豪)歌‧動態譜🎷</h1>
+    <h1> 🎷好(豪)歌‧動態譜🎷 </h1>
 
-    <div class="song-list" id="song-list"></div>
+    <div class="container">
+        <div class="table-scroll-container">
+            <table class="song-table">
+                <thead>
+                    <tr style="color: var(--neon-pink); text-align: left;">
+                        <th style="padding: 10px; position: sticky; top: 0; background: var(--bg-dark); z-index: 10;">[ 🎷曲目列表🎷 ]</th>
+                        <th style="padding: 10px; text-align: right; position: sticky; top: 0; background: var(--bg-dark); z-index: 10;">[ 🎵資源連結🎵 ]</th>
+                    </tr>
+                </thead>
+                <tbody id="song-list-body">
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <div id="media-display">
-        <div id="media-title" style="color:var(--neon-blue); margin-bottom:12px; font-weight:bold;"></div>
+        <div class="media-header-container">
+            <h2 id="media-title" style="color: var(--neon-blue); margin: 0;">播放中...</h2>
+            <div id="media-actions" style="display: inline-flex; gap: 10px;"></div>
+        </div>
+        <div id="sheet-audio-container"></div>
         <div id="media-content"></div>
         <button class="close-btn" onclick="closePlayer()">關閉播放視窗</button>
     </div>
 
-    <script>
-        // ！！！注意：如果你改了檔名，這裡也要跟著改 ！！！
-        const songs = [
-            {
-                name: "另一種鄉愁",
-                sheet: ["sheets/另一種鄉愁.png", "sheets/另一種鄉愁1.png"],
-                mp3: "music/另一種鄉愁.mp3",
-                demo_mp4: "video/song01_demo.mp4",
-                backing_mp4: "video/song01_back.mp4"
-            },
-            {
-                name: "若是有一天",
-                sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"],
-                mp3: "music/若是有一天.mp3",
-                demo_mp4: "video/若是有一天.mp4",
-                backing_mp4: "video/若是有一天1.mp4"
-            }
-        ];
+    <div class="status-bar">SYSTEM STATUS: READY // USER: ADMIN // DATA_LOADED: 100%</div>
 
-        const listContainer = document.getElementById('song-list');
+    <script>
+        const songs = [
+            { name: "68. 這世界那麼多人 (Bb調,Eb調指法)", sheet: ["sheets/這世界那麼多人.png", "sheets/這世界那麼多人1.png"], mp3: "music/這世界那麼多人.mp3", demo_mp4: "video/這世界那麼多人.mp4", backing_mp4: "video/這世界那麼多人1.mp4" }, 
+            { name: "67. 海闊天空 (F調,Eb調指法)", sheet: ["sheets/海闊天空.png", "sheets/海闊天空1.png"], mp3: "music/海闊天空.mp3", demo_mp4: "video/海闊天空.mp4", backing_mp4: "video/海闊天空1.mp4" }, 
+            { name: "66. MY WAY-奪標 (Bb調,Eb調指法)", sheet: ["sheets/MY WAY.png", "sheets/MY WAY1.png"], mp3: "music/MY WAY.mp3", demo_mp4: "video/MY WAY.mp4", backing_mp4: "video/MY WAY1.mp4" }, 
+            { name: "65. 老鷹之歌-EI Condor Pasa (Eb調指法)", sheet: ["sheets/老鷹之歌.png", "sheets/老鷹之歌1.png"], mp3: "music/老鷹之歌.mp3", demo_mp4: "video/老鷹之歌.mp4", backing_mp4: "video/老鷹之歌1.mp4" }, 
+            { name: "64. 世界贈予我的 (Bb調,Eb調指法)", sheet: ["sheets/世界贈予我的.png", "sheets/世界贈予我的1.png"], mp3: "music/世界贈予我的.mp3", demo_mp4: "video/世界贈予我的.mp4", backing_mp4: "video/世界贈予我的1.mp4" },      
+            { name: "63. 雪落下的聲音 (Bb調,Eb調指法)", sheet: ["sheets/雪落下的聲音.png", "sheets/雪落下的聲音1.png"], mp3: "music/雪落下的聲音.mp3", demo_mp4: "video/雪落下的聲音.mp4", backing_mp4: "video/雪落下的聲音1.mp4" },      
+            { name: "62. More than I can say-愛你在心口難開 (Bb調,Eb調指法)", sheet: ["sheets/More than I can say.png", "sheets/More than I can say1.png"], mp3: "music/More than I can say.mp3", demo_mp4: "video/More than I can say.mp4", backing_mp4: "video/More than I can say1.mp4" },      
+            { name: "61. 聖誕老公公進城來 (Gb調,Eb調指法)", sheet: ["sheets/聖誕老公公進城來.png", "sheets/聖誕老公公進城來1.png"], mp3: "music/聖誕老公公進城來.mp3", demo_mp4: "video/聖誕老公公進城來.mp4", backing_mp4: "video/聖誕老公公進城來1.mp4" },  
+            { name: "60. The sound of silence-寂靜之聲 (Eb調指法)", sheet: ["sheets/The sound of silence.png", "sheets/The sound of silence1.png"], mp3: "music/The sound of silence.mp3", demo_mp4: "video/The sound of silence.mp4", backing_mp4: "video/The sound of silence1.mp4" },     
+            { name: "59. 成都 (Eb調指法)", sheet: ["sheets/成都.png", "sheets/成都1.png"], mp3: "music/成都.mp3", demo_mp4: "video/成都.mp4", backing_mp4: "video/成都1.mp4" },     
+            { name: "58. 西海情歌 (F調,Eb調指法)", sheet: ["sheets/西海情歌.png", "sheets/西海情歌1.png"], mp3: "music/西海情歌.mp3", demo_mp4: "video/西海情歌.mp4", backing_mp4: "video/西海情歌1.mp4" }, 
+            { name: "57. 沒出息 (Bb調指法)", sheet: ["sheets/沒出息.png", "sheets/沒出息1.png"], mp3: "music/沒出息.mp3", demo_mp4: "video/沒出息.mp4", backing_mp4: "video/沒出息1.mp4" },    
+            { name: "56. 帶刺的玫瑰 (C調,Bb調指法)", sheet: ["sheets/帶刺的玫瑰.png", "sheets/帶刺的玫瑰1.png"], mp3: "music/帶刺的玫瑰.mp3", demo_mp4: "video/帶刺的玫瑰.mp4", backing_mp4: "video/帶刺的玫瑰1.mp4" },    
+            { name: "55. PERFECT-完美無瑕 (Eb調指法)", sheet: ["sheets/PERFECT.png", "sheets/PERFECT1.png"], mp3: "music/PERFECT.mp3", demo_mp4: "video/PERFECT.mp4", backing_mp4: "video/PERFECT1.mp4" },  
+            { name: "54. 愛情轉移-富士山下 (C調,Eb調指法)", sheet: ["sheets/愛情轉移.png", "sheets/愛情轉移1.png"], mp3: "music/愛情轉移.mp3", demo_mp4: "video/愛情轉移.mp4", backing_mp4: "video/愛情轉移1.mp4" },    
+            { name: "53. 小姐請妳給我愛 (Bb調,Eb調指法)", sheet: ["sheets/小姐請妳給我愛.png", "sheets/小姐請妳給我愛1.png", "sheets/小姐請妳給我愛2.png"], mp3: "music/小姐請妳給我愛.mp3", demo_mp4: "video/小姐請妳給我愛.mp4", backing_mp4: "video/小姐請妳給我愛1.mp4" },        
+            { name: "52. Yesterday once more (Bb調,Eb調指法)", sheet: ["sheets/Yesterday once more.png", "sheets/Yesterday once more1.png"], mp3: "music/Yesterday once more.mp3", demo_mp4: "video/Yesterday once more.mp4", backing_mp4: "video/Yesterday once more1.mp4" },      
+            { name: "51. 站在高崗上 (Bb調,Eb調指法)", sheet: ["sheets/站在高崗上.png", "sheets/站在高崗上1.png"], mp3: "music/站在高崗上.mp3", demo_mp4: "video/站在高崗上.mp4", backing_mp4: "video/站在高崗上1.mp4" },    
+            { name: "50. Making love out of nothing at all (G調,Eb調指法)", sheet: ["sheets/Making love out of nothing at all.png", "sheets/Making love out of nothing at all1.png", "sheets/Making love out of nothing at all2.png"], mp3: "music/Making love out of nothing at all.mp3", demo_mp4: "video/Making love out of nothing at all.mp4", backing_mp4: "video/Making love out of nothing at all1.mp4" },    
+            { name: "49. 愛情限時批 (Eb調指法)", sheet: ["sheets/愛情限時批.png", "sheets/愛情限時批1.png"], mp3: "music/愛情限時批.mp3", demo_mp4: "video/愛情限時批.mp4", backing_mp4: "video/愛情限時批1.mp4" },     
+            { name: "48. 人生公路 (Eb調指法)", sheet: ["sheets/人生公路.png", "sheets/人生公路1.png", "sheets/人生公路2.png"], mp3: "music/人生公路.mp3", demo_mp4: "video/人生公路.mp4", backing_mp4: "video/人生公路1.mp4" },    
+            { name: "47. 粉紅超跑 (C調,Eb調指法)", sheet: ["sheets/粉紅超跑.png", "sheets/粉紅超跑1.png"], mp3: "music/粉紅超跑.mp3", demo_mp4: "video/粉紅超跑.mp4", backing_mp4: "video/粉紅超跑1.mp4" },    
+            { name: "46. 黃昏 (Bb調,Eb調指法)", sheet: ["sheets/黃昏.png", "sheets/黃昏1.png"], mp3: "music/黃昏.mp3", demo_mp4: "video/黃昏.mp4", backing_mp4: "video/黃昏1.mp4" },  
+            { name: "45. 甲你攬牢牢 (C調,Eb調指法)", sheet: ["sheets/甲你攬牢牢.png", "sheets/甲你攬牢牢1.png"], mp3: "music/甲你攬牢牢.mp3", demo_mp4: "video/甲你攬牢牢.mp4", backing_mp4: "video/甲你攬牢牢1.mp4" },       
+            { name: "44. 我愛你勝過你愛我 (Bb調,Eb調指法)", sheet: ["sheets/我愛你勝過你愛我.png", "sheets/我愛你勝過你愛我1.png"], mp3: "music/我愛你勝過你愛我.mp3", demo_mp4: "video/我愛你勝過你愛我.mp4", backing_mp4: "video/我愛你勝過你愛我1.mp4" },       
+            { name: "43. 雨蝶-沙漠寂寞 (Eb調指法)", sheet: ["sheets/雨蝶.png", "sheets/雨蝶1.png"], mp3: "music/雨蝶.mp3", demo_mp4: "video/雨蝶.mp4", backing_mp4: "video/雨蝶1.mp4" },       
+            { name: "42. 最後一封信 (Bb調,Eb調指法)", sheet: ["sheets/最後一封信.png", "sheets/最後一封信1.png"], mp3: "music/最後一封信.mp3", demo_mp4: "video/最後一封信.mp4", backing_mp4: "video/最後一封信1.mp4" },       
+            { name: "41. 情難枕 (Eb調指法)", sheet: ["sheets/情難枕.png", "sheets/情難枕1.png"], mp3: "music/情難枕.mp3", demo_mp4: "video/情難枕.mp4", backing_mp4: "video/情難枕1.mp4" },       
+            { name: "40. 我是一隻小小鳥 (Bb調,Eb調指法)", sheet: ["sheets/我是一隻小小鳥.png", "sheets/我是一隻小小鳥1.png"], mp3: "music/我是一隻小小鳥.mp3", demo_mp4: "video/我是一隻小小鳥.mp4", backing_mp4: "video/我是一隻小小鳥1.mp4" },       
+            { name: "39. 男兒當自強 (Eb調指法)", sheet: ["sheets/男兒當自強.png", "sheets/男兒當自強1.png"], mp3: "music/男兒當自強.mp3", demo_mp4: "video/男兒當自強.mp4", backing_mp4: "video/男兒當自強1.mp4" },       
+            { name: "38. 金風玉露 (C調,Eb調指法)", sheet: ["sheets/金風玉露.png", "sheets/金風玉露1.png"], mp3: "music/金風玉露.mp3", demo_mp4: "video/金風玉露.mp4", backing_mp4: "video/金風玉露1.mp4" },       
+            { name: "37. 感恩的心 (Bb調,Eb調指法)", sheet: ["sheets/感恩的心.png", "sheets/感恩的心1.png"], mp3: "music/感恩的心.mp3", demo_mp4: "video/感恩的心.mp4", backing_mp4: "video/感恩的心1.mp4" },       
+            { name: "36. MOJITO-莫吉托 (Eb調指法)", sheet: ["sheets/MOJITO.png", "sheets/MOJITO1.png"], mp3: "music/MOJITO.mp3", demo_mp4: "video/MOJITO.mp4", backing_mp4: "video/MOJITO1.mp4" },       
+            { name: "35. 最遠的妳是我最近的愛 (Eb調指法)", sheet: ["sheets/最遠的妳是我最近的愛.png", "sheets/最遠的妳是我最近的愛1.png"], mp3: "music/最遠的妳是我最近的愛.mp3", demo_mp4: "video/最遠的妳是我最近的愛.mp4", backing_mp4: "video/最遠的妳是我最近的愛1.mp4" },       
+            { name: "34. APT-阿帕次 (Eb調指法)", sheet: ["sheets/APT.png", "sheets/APT1.png"], mp3: "music/APT.mp3", demo_mp4: "video/APT.mp4", backing_mp4: "video/APT1.mp4" },       
+            { name: "33. 聖誕組曲-SWING版 (F調,Eb調指法)", sheet: ["sheets/聖誕組曲.png", "sheets/聖誕組曲1.png"], mp3: "music/聖誕組曲.mp3", demo_mp4: "video/聖誕組曲.mp4", backing_mp4: "video/聖誕組曲1.mp4" },       
+            { name: "32. 繼續-給15歲的自己 (Ab調,Eb調指法)", sheet: ["sheets/繼續.png", "sheets/繼續1.png"], mp3: "music/繼續.mp3", demo_mp4: "video/繼續.mp4", backing_mp4: "video/繼續1.mp4" },     
+            { name: "31. 征服-Cheng Fu (Eb調指法)", sheet: ["sheets/征服.png", "sheets/征服1.png"], mp3: "music/征服.mp3", demo_mp4: "video/征服.mp4", backing_mp4: "video/征服1.mp4" },     
+            { name: "30. ANAK孩兒-愛著啊 (Eb調指法)", sheet: ["sheets/ANAK孩兒.png", "sheets/ANAK孩兒1.png"], mp3: "music/ANAK孩兒.mp3", demo_mp4: "video/ANAK孩兒.mp4", backing_mp4: "video/ANAK孩兒1.mp4" },     
+            { name: "29. 無言花-(藍調爵士版) (C調,Eb調指法)", sheet: ["sheets/無言花.png", "sheets/無言花1.png"], mp3: "music/無言花.mp3", demo_mp4: "video/無言花.mp4", backing_mp4: "video/無言花1.mp4" },     
+            { name: "28. Lemon Tree-檸檬樹 (Ab調,Eb調指法)", sheet: ["sheets/Lemon Tree.png", "sheets/Lemon Tree1.png"], mp3: "music/Lemon Tree.mp3", demo_mp4: "video/Lemon Tree.mp4", backing_mp4: "video/Lemon Tree1.mp4" },  
+            { name: "27. Gimme Gimme Gimme Sexy Music (Ab調,Eb調指法)", sheet: ["sheets/Gimme Gimme Gimme Sexy Music.png", "sheets/Gimme Gimme Gimme Sexy Music1.png"], mp3: "music/Gimme Gimme Gimme Sexy Music.mp3", demo_mp4: "video/Gimme Gimme Gimme Sexy Music.mp4", backing_mp4: "video/Gimme Gimme Gimme Sexy Music1.mp4" },  
+            { name: "26. 布袋戲組曲 (Eb調,轉Bb調,Eb調)", sheet: ["sheets/布袋戲組曲.png", "sheets/布袋戲組曲1.png"], mp3: "music/布袋戲組曲.mp3", demo_mp4: "video/布袋戲組曲.mp4", backing_mp4: "video/布袋戲組曲1.mp4" },  
+            { name: "25. 愛你一萬年-(變奏曲) (Eb調)", sheet: ["sheets/愛你一萬年.png", "sheets/愛你一萬年1.png"], mp3: "music/愛你一萬年.mp3", demo_mp4: "video/愛你一萬年.mp4", backing_mp4: "video/愛你一萬年1.mp4" },  
+            { name: "24. 花路 (Eb調)", sheet: ["sheets/花路.png", "sheets/花路1.png"], mp3: "music/花路.mp3", demo_mp4: "video/花路.mp4", backing_mp4: "video/花路1.mp4" },  
+            { name: "23. Always Remember Us This Way (Bb調)", sheet: ["sheets/Always Remember Us This Way.png", "sheets/Always Remember Us This Way1.png"], mp3: "music/Always Remember Us This Way.mp3", demo_mp4: "video/Always Remember Us This Way.mp4", backing_mp4: "video/Always Remember Us This Way1.mp4" },  
+            { name: "22. 到底愛我不愛 (Eb調)", sheet: ["sheets/到底愛我不愛.png", "sheets/到底愛我不愛1.png"], mp3: "music/到底愛我不愛.mp3", demo_mp4: "video/到底愛我不愛.mp4", backing_mp4: "video/到底愛我不愛1.mp4" },  
+            { name: "21. 妳是我的花朵 (Eb調)", sheet: ["sheets/妳是我的花朵.png", "sheets/妳是我的花朵1.png"], mp3: "music/妳是我的花朵.mp3", demo_mp4: "video/妳是我的花朵.mp4", backing_mp4: "video/妳是我的花朵1.mp4" },  
+            { name: "20. HAVANA-哈瓦那 (Bb調)", sheet: ["sheets/HAVANA.png", "sheets/HAVANA1.png"], mp3: "music/HAVANA.mp3", demo_mp4: "video/HAVANA.mp4", backing_mp4: "video/HAVANA1.mp4" },  
+            { name: "19. 阿拉斯加海灣 (Eb調)", sheet: ["sheets/阿拉斯加海灣.png", "sheets/阿拉斯加海灣1.png"], mp3: "music/阿拉斯加海灣.mp3", demo_mp4: "video/阿拉斯加海灣.mp4", backing_mp4: "video/阿拉斯加海灣1.mp4" },  
+            { name: "18. 戀曲1990 (Eb調)", sheet: ["sheets/戀曲1990.png", "sheets/戀曲19901.png"], mp3: "music/戀曲1990.mp3", demo_mp4: "video/戀曲1990.mp4", backing_mp4: "video/戀曲19901.mp4" },  
+            { name: "17. SENORITA (C調)", sheet: ["sheets/SENORITA.png", "sheets/SENORITA1.png", "sheets/SENORITA2.png"], mp3: "music/SENORITA.mp3", demo_mp4: "video/SENORITA.mp4", backing_mp4: "video/SENORITA1.mp4" },  
+            { name: "16. SUGAR (Bb調)", sheet: ["sheets/SUGAR.png", "sheets/SUGAR1.png"], mp3: "music/SUGAR.mp3", demo_mp4: "video/SUGAR.mp4", backing_mp4: "video/SUGAR1.mp4" },  
+            { name: "15. 綠島小夜曲 (Eb調)", sheet: ["sheets/綠島小夜曲.png", "sheets/綠島小夜曲1.png"], mp3: "music/綠島小夜曲.mp3", demo_mp4: "video/綠島小夜曲.mp4", backing_mp4: "video/綠島小夜曲1.mp4" },  
+            { name: "14. 日不落 (Eb調)", sheet: ["sheets/日不落.png", "sheets/日不落1.png"], mp3: "music/日不落.mp3", demo_mp4: "video/日不落.mp4", backing_mp4: "video/日不落1.mp4" },  
+            { name: "13. The One You Love (Eb調)", sheet: ["sheets/The One You Love.png", "sheets/The One You Love1.png"], mp3: "music/The One You Love.mp3", demo_mp4: "video/The One You Love.mp4", backing_mp4: "video/The One You Love1.mp4" },  
+            { name: "12. 明天你是否依然愛我 (Eb調)", sheet: ["sheets/明天你是否依然愛我.png", "sheets/明天你是否依然愛我1.png"], mp3: "music/明天你是否依然愛我.mp3", demo_mp4: "video/明天你是否依然愛我.mp4", backing_mp4: "video/明天你是否依然愛我1.mp4" },  
+            { name: "11. 如果可以 (Eb調)", sheet: ["sheets/如果可以.png", "sheets/如果可以1.png"], mp3: "music/如果可以.mp3", demo_mp4: "video/如果可以.mp4", backing_mp4: "video/如果可以1.mp4" },  
+            { name: "10. 大阪時雨 (Bb調)", sheet: ["sheets/大阪時雨.png", "sheets/大阪時雨1.png"], mp3: "music/大阪時雨.mp3", demo_mp4: "video/大阪時雨.mp4", backing_mp4: "video/大阪時雨1.mp4" },  
+            { name: "9. 至少還有你 (Eb調)", sheet: ["sheets/至少還有你.png", "sheets/至少還有你1.png"], mp3: "music/至少還有你.mp3", demo_mp4: "video/至少還有你.mp4", backing_mp4: "video/至少還有你1.mp4" },  
+            { name: "8. 原來你不識愛過我 (Bb調)", sheet: ["sheets/原來你不識愛過我.png", "sheets/原來你不識愛過我1.png"], mp3: "music/原來你不識愛過我.mp3", demo_mp4: "video/原來你不識愛過我.mp4", backing_mp4: "video/原來你不識愛過我1.mp4" },  
+            { name: "7. 純情青春夢 (Eb調)", sheet: ["sheets/純情青春夢.png", "sheets/純情青春夢1.png"], mp3: "music/純情青春夢.mp3", demo_mp4: "video/純情青春夢.mp4", backing_mp4: "video/純情青春夢1.mp4" },  
+            { name: "6. CASABLANCA-卡薩布蘭卡 (C調)", sheet: ["sheets/Casablanca.png", "sheets/Casablanca1.png"], mp3: "music/Casablanca.mp3", demo_mp4: "video/Casablanca.mp4", backing_mp4: "video/Casablanca1.mp4" }, 
+            { name: "5. 給你們 (Eb調)", sheet: ["sheets/給你們.png", "sheets/給你們1.png"], mp3: "music/給你們.mp3", demo_mp4: "video/給你們.mp4", backing_mp4: "video/給你們1.mp4" },   
+            { name: "4. 莎巴女王 (Bb調)", sheet: ["sheets/莎巴女王.png", "sheets/莎巴女王1.png"], mp3: "music/莎巴女王.mp3", demo_mp4: "video/莎巴女王.mp4", backing_mp4: "video/莎巴女王1.mp4" },
+            { name: "3. 但是又何奈 (Bb調)", sheet: ["sheets/但是又何奈.png", "sheets/但是又何奈1.png"], mp3: "music/但是又何奈.mp3", demo_mp4: "video/但是又何奈.mp4", backing_mp4: "video/離開了1.mp4" }, 
+            { name: "2. 若是有一天 (Eb調)", sheet: ["sheets/若是有一天.png", "sheets/若是有一天1.png"], mp3: "music/若是有一天.mp3", demo_mp4: "video/若是有一天.mp4", backing_mp4: "video/若是有一天1.mp4" },   
+            { name: "1. 另一種鄉愁 (Bb調)", sheet: ["sheets/另一種鄉愁.png", "sheets/另一種鄉愁1.png"], mp3: "music/另一種鄉愁.mp3", demo_mp4: "video/另一種鄉愁.mp4", backing_mp4: "video/另一種鄉愁1.mp4" }
+        ];
+        
+        const listBody = document.getElementById('song-list-body');
         const mediaDisplay = document.getElementById('media-display');
         const mediaContent = document.getElementById('media-content');
         const mediaTitle = document.getElementById('media-title');
+        const mediaActions = document.getElementById('media-actions');
+        const sheetAudioContainer = document.getElementById('sheet-audio-container');
 
+        // 生成清單的邏輯 (增加 id 以便做高亮切換)
         songs.forEach((song, index) => {
-            const card = document.createElement('div');
-            card.className = 'song-card';
-            card.innerHTML = `
-                <div class="song-info">${song.name}</div>
-                <div class="btn-group">
-                    <button onclick="openMedia('sheet', ${index}, '${song.name}')">看簡譜</button>
-                    <button class="btn-mp3" onclick="openMedia('mp3', '${song.mp3}', '${song.name}')">聽伴奏</button>
-                    <button class="btn-demo" onclick="openMedia('video', '${song.demo_mp4}', '${song.name}-示範')">看示範</button>
-                    <button onclick="openMedia('video', '${song.backing_mp4}', '${song.name}-動態')">動態譜</button>
-                </div>
+            const tr = document.createElement('tr');
+            tr.className = 'song-item';
+            tr.id = `song-row-${index}`; // 💡 給每一列專屬 ID
+            tr.innerHTML = `
+                <td class="song-name">${song.name}</td>
+                <td>
+                    <div class="btn-group">
+                        <button onclick="openMedia('sheet', ${index}, '${song.name}')">🎷簡譜.PDF</button>
+                        <button class="btn-mp3" onclick="openMedia('mp3', ${index}, '${song.name}')">🎷伴奏.mp3</button>
+                        <button class="btn-video-demo" onclick="openMedia('video', ${index}, '${song.name} - 演奏示範', 'demo_mp4')">🎵演奏示範</button>
+                        <button onclick="openMedia('video', ${index}, '${song.name} - 純伴奏', 'backing_mp4')">🎵純伴奏</button>
+                    </div>
+                </td>
             `;
-            listContainer.appendChild(card);
+            listBody.appendChild(tr);
         });
 
-        function openMedia(type, urlOrIndex, title) {
+        // 統一播放控制
+        function openMedia(type, songIndex, title, videoKey = 'demo_mp4') {
             mediaDisplay.style.display = 'block';
-            mediaTitle.innerText = `[ PLAYING ] > ${title}`;
-            mediaContent.innerHTML = ''; 
+            mediaTitle.innerText = `> 正在讀取: ${title}`;
             
+            // 清空內容與動作按鈕
+            mediaContent.innerHTML = ''; 
+            mediaActions.innerHTML = '';
+            sheetAudioContainer.innerHTML = '';
+
+            // 💡 移除所有歌曲的高亮狀態，並為當前點擊的歌曲加上高亮
+            document.querySelectorAll('.song-item').forEach(el => el.classList.remove('active-song'));
+            document.getElementById(`song-row-${songIndex}`).classList.add('active-song');
+
+            const currentSong = songs[songIndex];
+
+            // 新增全域下載按鈕功能
+            const downloadBtn = document.createElement('button');
+            downloadBtn.className = 'media-action-btn';
+            downloadBtn.innerText = '📥 下載資源';
+            downloadBtn.onclick = function() {
+                window.open('https://drive.google.com/drive/u/0/folders/1HBKQdUi_PC_IObuaZ6BuM0s00lqtEv7F?hl=zh-TW', '_blank');
+            };
+            mediaActions.appendChild(downloadBtn);
+
+            // 依照類型渲染核心內容
             if (type === 'sheet') {
-                const sheetData = songs[urlOrIndex].sheet;
+                const playAudioBtn = document.createElement('button');
+                playAudioBtn.className = 'media-action-btn btn-mp3';
+                playAudioBtn.innerText = '🎵 播放伴奏';
+                playAudioBtn.onclick = function() {
+                    sheetAudioContainer.innerHTML = `<p style="color:#fff; margin: 5px 0;">背景伴奏音樂播放中...</p><audio controls autoplay src="${currentSong.mp3}" style="margin-bottom:15px; width: 100%; max-width: 500px;"></audio>`;
+                };
+                mediaActions.appendChild(playAudioBtn);
+
+                const sheetData = currentSong.sheet;
                 let imgs = Array.isArray(sheetData) ? sheetData : [sheetData];
-                mediaContent.innerHTML = imgs.map(imgUrl => `<img src="${encodeURI(imgUrl)}">`).join('');
+                mediaContent.innerHTML = imgs.map(imgUrl => `<img src="${imgUrl}" style="width:100%; margin-bottom:10px; border:1px solid #00f3ff;">`).join('');
+
             } else if (type === 'mp3') {
-                mediaContent.innerHTML = `<audio controls autoplay src="${encodeURI(urlOrIndex)}"></audio>`;
+                mediaContent.innerHTML = `<p style="color:#fff">音訊軌道載入中...</p><audio controls autoplay src="${currentSong.mp3}" style="width: 100%; max-width: 500px;"></audio>`;
+
             } else if (type === 'video') {
-                // iPhone Safari 強制處理：使用 encodeURI 處理中文路徑
-                const safeUrl = encodeURI(urlOrIndex);
-                mediaContent.innerHTML = `
-                    <video id="safari-v" controls playsinline webkit-playsinline preload="auto">
-                        <source src="${safeUrl}" type="video/mp4">
-                    </video>`;
-                
-                const v = document.getElementById('safari-v');
-                v.load();
-                v.play().catch(() => {
-                    console.log("iPhone 要求手動點擊播放");
-                });
+                const videoUrl = currentSong[videoKey];
+                mediaContent.innerHTML = `<video controls autoplay playsinline preload="auto" src="${videoUrl}"></video>`;
             }
             
-            setTimeout(() => {
-                mediaDisplay.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }, 100);
+            window.scrollTo({ top: mediaDisplay.offsetTop - 20, behavior: 'smooth' });
         }
 
+        // 關閉播放器
         function closePlayer() {
             mediaDisplay.style.display = 'none';
             mediaContent.innerHTML = '';
+            mediaActions.innerHTML = '';
+            sheetAudioContainer.innerHTML = '';
+            
+            // 關閉視窗時也可以選擇移除高亮，或者保留以提示剛剛看了哪首 (這裡選擇保留，讓使用者知道進度)
         }
     </script>
 </body>
