@@ -286,7 +286,7 @@
             { name: "30. ANAK孩兒-愛著啊 (Eb調指法)", sheet: ["sheets/ANAK孩兒.png", "sheets/ANAK孩兒1.png"], mp3: "music/ANAK孩兒.mp3", demo_mp4: "video/ANAK孩兒.mp4", backing_mp4: "video/ANAK孩兒1.mp4" },     
             { name: "29. 無言花-(藍調爵士版) (C調,Eb調指法)", sheet: ["sheets/無言花.png", "sheets/無言花1.png"], mp3: "music/無言花.mp3", demo_mp4: "video/無言花.mp4", backing_mp4: "video/無言花1.mp4" },     
             { name: "28. Lemon Tree-檸檬樹 (Ab調,Eb調指法)", sheet: ["sheets/Lemon Tree.png", "sheets/Lemon Tree1.png"], mp3: "music/Lemon Tree.mp3", demo_mp4: "video/Lemon Tree.mp4", backing_mp4: "video/Lemon Tree1.mp4" },  
-            { name: "27. Gimme Gimme Gimme Sexy Music (Ab調,Eb調指法)", sheet: ["sheets/Gimme Gimme Gimme Sexy Music.png", "sheets/Gimme Gimme Gimme Sexy Music1.png"], mp3: "music/Gimme Gimme Gimme Sexy Music.mp3", demo_mp4: "video/Gimme Gimme Gimme Sexy Music.mp4", backing_mp4: "video/Gimme Gimme Gimme Sexy Music1.mp4" },  
+            { name: "27. Gimme Gimme Gimme Sexy Music (Ab調,Eb調指法)", sheet: ["sheets/Gimme Gimme Gimme Sexy Music.png", "sheets/Gimme Gimme Gimme Sexy Music1.png", "sheets/Gimme Gimme Gimme Sexy Music2.png", "sheets/Gimme Gimme Gimme Sexy Music3.png"], mp3: "music/Gimme Gimme Gimme Sexy Music.mp3", demo_mp4: "video/Gimme Gimme Gimme Sexy Music.mp4", backing_mp4: "video/Gimme Gimme Gimme Sexy Music1.mp4" },  
             { name: "26. 布袋戲組曲 (Eb調,轉Bb調,Eb調)", sheet: ["sheets/布袋戲組曲.png", "sheets/布袋戲組曲1.png"], mp3: "music/布袋戲組曲.mp3", demo_mp4: "video/布袋戲組曲.mp4", backing_mp4: "video/布袋戲組曲1.mp4" },  
             { name: "25. 愛你一萬年-(變奏曲) (Eb調)", sheet: ["sheets/愛你一萬年.png", "sheets/愛你一萬年1.png"], mp3: "music/愛你一萬年.mp3", demo_mp4: "video/愛你一萬年.mp4", backing_mp4: "video/愛你一萬年1.mp4" },  
             { name: "24. 花路 (Eb調)", sheet: ["sheets/花路.png", "sheets/花路1.png"], mp3: "music/花路.mp3", demo_mp4: "video/花路.mp4", backing_mp4: "video/花路1.mp4" },  
@@ -385,7 +385,7 @@
 
             } else if (type === 'video') {
                 const videoUrl = currentSong[videoKey];
-                mediaContent.innerHTML = `<video controls autoplay playsinline preload="auto" src="${videoUrl}"></video>`;
+                mediaContent.innerHTML = `<video controls autoplay src="${videoUrl}"></video>`;
             }
             
             window.scrollTo({ top: mediaDisplay.offsetTop - 20, behavior: 'smooth' });
